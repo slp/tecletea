@@ -1,0 +1,35 @@
+name: tecletea
+description: An application for the introduction into reading and the use of the keyboard.
+
+publish_to: 'none' # Remove this line if you wish to publish to pub.dev
+
+version: 0.0.1+1
+
+environment:
+  sdk: '>=2.18.4 <3.0.0'
+
+dependencies:
+  flutter:
+    sdk: flutter
+
+  provider: ^6.0.0
+  http: ^0.13.0
+  just_audio: ^0.9.13
+  shared_preferences: ^2.0.18
+  flutter_localizations:
+    sdk: flutter
+  intl: any
+  
+dev_dependencies:
+  flutter_test:
+    sdk: flutter
+
+  flutter_lints: ^2.0.0
+
+flutter:
+  uses-material-design: true
+  generate: true
+
+assets:
+  - sounds/success.mp3
+  - sounds/applause.mp3

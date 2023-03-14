@@ -1,0 +1,21 @@
+{
+  "introduction": "Bienvenido a TecleTEA, una aplicación para la introducción a la lectoescritura y el uso del teclado",
+  "keyboardRequirement": "Esta aplicación ha sido diseñada para usarse en ordenadores y tablets con teclado físico. Probablemente no funcione correctamente en otros dispositivos",
+  "start": "EMPEZAR",
+  "pictoUse": "Esta aplicación hace uso de pictogramas y locuciones de ARASAAC.",
+  "pictoLicense1": "Los símbolos pictográficos utilizados son propiedad del Gobierno de Aragón",
+  "pictoLicense2": "y han sido creados por Sergio Palao para ARASAAC (http://www.arasaac.org),",
+  "pictoLicense3": "que los distribuye bajo Licencia Creative Commons BY-NC-SA.",
+  "completed": "¡COMPLETADO!",
+  "again": "OTRA VEZ",
+  "words": "Palabras",
+  "characters": "Caracteres",
+  "wordsPerSession": "Número de palabras por sesión: ",
+  "minCharacters": "Número mínimo de caracteres por palabra: ",
+  "maxCharacters": "Número máximo de caracteres por palabra: ",
+  "includedCategories": "Categorías incluídas",
+  "excludedCategories": "Categorías excluídas",
+  "save": "GUARDAR",
+  "restore": "RESTAURAR",
+  "credits": "TecleTEA desarrollado por Sergio López (https://github.com/slp/tecletea)"
+}
