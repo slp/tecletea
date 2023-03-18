@@ -1,6 +1,6 @@
 {
   "introduction": "Welcome to TecleTEA, an application for the introduction into literacy and the use of the keyboard",
-  "keyboardRequirement": "This application has been designed to be used in a computer or tablet with a physical keyboard. Most likely won't work on other devices",
+  "keyboardRequirement": "This application has been designed to be used on a computer with Chrome or Firefox and a physical keyboard. It may not work properly on other devices",
   "start": "START",
   "pictoUse": "This application makes use of ARASAAC's pictograms are locutions",
   "pictoLicense1": "The pictographic symbols used are the property of the Government of Aragón",

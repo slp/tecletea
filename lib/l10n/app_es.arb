@@ -1,6 +1,6 @@
 {
   "introduction": "Bienvenido a TecleTEA, una aplicación para la introducción a la lectoescritura y el uso del teclado",
-  "keyboardRequirement": "Esta aplicación ha sido diseñada para usarse en ordenadores y tablets con teclado físico. Probablemente no funcione correctamente en otros dispositivos",
+  "keyboardRequirement": "Esta aplicación ha sido diseñada para usarse en un ordenador con Chrome o Firefox y un teclado físico. Puede que no funcione correctamente en otros dispositivos",
   "start": "EMPEZAR",
   "pictoUse": "Esta aplicación hace uso de pictogramas y locuciones de ARASAAC.",
   "pictoLicense1": "Los símbolos pictográficos utilizados son propiedad del Gobierno de Aragón",
