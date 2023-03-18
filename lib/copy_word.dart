@@ -4,6 +4,7 @@ import 'dart:ui';
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
+import 'package:tecletea/constants.dart';
 
 class CopyWord extends StatefulWidget {
   final String word;
@@ -20,7 +21,7 @@ class CopyWord extends StatefulWidget {
 }
 
 class _CopyWordState extends State<CopyWord> {
-  List<String> entry = List.filled(12, '\u200b');
+  late List<String> entry;
   late AudioPlayer _player;
   var _focusNodes = [];
   var _entryEnabled = true;
@@ -49,12 +50,26 @@ class _CopyWordState extends State<CopyWord> {
   void initState() {
     super.initState();
     _player = AudioPlayer();
-    for (var i = 0; i < 12; i++) {
+    entry = List.filled(LIMIT_MAX_CHARACTERS, '\u200b');
+    for (var i = 0; i < LIMIT_MAX_CHARACTERS; i++) {
       _focusNodes.add(FocusNode());
     }
   }
 
   int next(int min, int max) => min + _random.nextInt(max - min);
+
+  void resetEntry() {
+    entry = List.filled(LIMIT_MAX_CHARACTERS, '\u200b');
+
+    for (var f in _focusNodes) {
+      f.dispose();
+    }
+    _focusNodes = [];
+    for (var i = 0; i < LIMIT_MAX_CHARACTERS; i++) {
+      _focusNodes.add(FocusNode());
+    }
+    _focusNodes[0].requestFocus();
+  }
 
   void validate() async {
     setState(() {
@@ -86,21 +101,13 @@ class _CopyWordState extends State<CopyWord> {
       }
     }
 
-    for (var f in _focusNodes) {
-      f.dispose();
-    }
-    _focusNodes = [];
-    for (var i = 0; i < 12; i++) {
-      _focusNodes.add(FocusNode());
-    }
+    resetEntry();
 
-    entry = List.filled(64, '\u200b');
+    _success = false;
+
     setState(() {
       _entryEnabled = true;
     });
-
-    _success = false;
-    _focusNodes[0].requestFocus();
   }
 
   @override
@@ -143,10 +150,15 @@ class _CopyWordState extends State<CopyWord> {
               focusNode: _focusNodes[i],
               autofocus: autofocus,
               controller: _textControllers[i],
+              onTapOutside: (event) {},
               onChanged: (text) {
                 if (text.isEmpty) {
                   _textControllers[i].text = "\u200b";
-                  if (i > 0) {
+                  if (i == 0) {
+                    setState(() {
+                      resetEntry();
+                    });
+                  } else {
                     _textControllers[i - 1].text = "\u200b";
                     _focusNodes[i - 1].requestFocus();
                   }

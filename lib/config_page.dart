@@ -108,8 +108,8 @@ class _ConfigPageState extends State<ConfigPage> {
                         child: Slider(
                           value: _minCharacters.toDouble(),
                           min: 1,
-                          max: 8,
-                          divisions: 8,
+                          max: LIMIT_MAX_CHARACTERS.toDouble(),
+                          divisions: LIMIT_MAX_CHARACTERS,
                           label: AppLocalizations.of(context)!.characters,
                           onChanged: (double value) {
                             setState(() {
@@ -140,8 +140,8 @@ class _ConfigPageState extends State<ConfigPage> {
                         child: Slider(
                           value: _maxCharacters.toDouble(),
                           min: 1,
-                          max: 8,
-                          divisions: 8,
+                          max: LIMIT_MAX_CHARACTERS.toDouble(),
+                          divisions: LIMIT_MAX_CHARACTERS,
                           label: AppLocalizations.of(context)!.characters,
                           onChanged: (double value) {
                             setState(() {
