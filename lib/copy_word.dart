@@ -152,6 +152,8 @@ class _CopyWordState extends State<CopyWord> {
               autofocus: false,
               focusNode: _focusNodes[i],
               controller: _textControllers[i],
+              onFieldSubmitted: (value) {},
+              onEditingComplete: () {},
               onTapOutside: (event) {},
               onChanged: (text) {
                 if (text.isEmpty) {

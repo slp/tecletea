@@ -208,6 +208,8 @@ class _CompleteWordState extends State<CompleteWord> {
               focusNode: _focusNodes[i],
               autofocus: false,
               controller: _textControllers[i],
+              onFieldSubmitted: (value) {},
+              onEditingComplete: () {},
               onTapOutside: (event) {},
               onChanged: (text) {
                 if (text.isEmpty) {
