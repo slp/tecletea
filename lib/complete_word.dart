@@ -1,3 +1,4 @@
+import 'dart:collection';
 import 'dart:math';
 import 'dart:ui';
 
@@ -6,25 +7,29 @@ import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:tecletea/constants.dart';
 
-class CopyWord extends StatefulWidget {
+class CompleteWord extends StatefulWidget {
   final String word;
+  final int percentRevealed;
   final VoidCallback onCompletion;
 
-  const CopyWord({
+  const CompleteWord({
     Key? key,
     required this.word,
+    required this.percentRevealed,
     required this.onCompletion,
   }) : super(key: key);
 
   @override
-  State<CopyWord> createState() => _CopyWordState();
+  State<CompleteWord> createState() => _CompleteWordState();
 }
 
-class _CopyWordState extends State<CopyWord> {
+class _CompleteWordState extends State<CompleteWord> {
   late List<String> entry;
   late AudioPlayer _player;
+  var _revealedLetters = [];
   var _focusNodes = [];
   var _entryEnabled = true;
+  var _newWord = true;
   var _iteration = 0;
   var _success = false;
   final _entryTextStyle = const TextStyle(
@@ -54,7 +59,6 @@ class _CopyWordState extends State<CopyWord> {
     for (var i = 0; i < LIMIT_MAX_CHARACTERS; i++) {
       _focusNodes.add(FocusNode());
     }
-
     WidgetsBinding.instance.addPostFrameCallback((_) {
       // Trigger a rebuild to work around focus logic.
       setState(() {});
@@ -62,6 +66,28 @@ class _CopyWordState extends State<CopyWord> {
   }
 
   int next(int min, int max) => min + _random.nextInt(max - min);
+
+  void resetRevealed() {
+    _revealedLetters = [];
+    var wordLength = widget.word.length;
+    var numRevealedLetters = (wordLength * widget.percentRevealed) ~/ 100;
+    if (numRevealedLetters == 0 && widget.percentRevealed != 0) {
+      numRevealedLetters = 1;
+    }
+    if (numRevealedLetters >= wordLength) {
+      numRevealedLetters = wordLength - 1;
+    }
+    var i = 0;
+    while (i < numRevealedLetters) {
+      var index = next(0, wordLength - 1);
+      if (_revealedLetters.contains(index)) {
+        continue;
+      } else {
+        _revealedLetters.add(index);
+        i++;
+      }
+    }
+  }
 
   void resetEntry() {
     entry = List.filled(LIMIT_MAX_CHARACTERS, '\u200b');
@@ -72,6 +98,27 @@ class _CopyWordState extends State<CopyWord> {
     _focusNodes = [];
     for (var i = 0; i < LIMIT_MAX_CHARACTERS; i++) {
       _focusNodes.add(FocusNode());
+    }
+  }
+
+  int findNextTarget(int current, bool backwards) {
+    var increment = 1;
+    if (backwards) {
+      increment = -1;
+    }
+    var target = current + increment;
+    var found = false;
+    while (target >= 0 && target < widget.word.length) {
+      if (!_revealedLetters.contains(target)) {
+        found = true;
+        break;
+      }
+      target += increment;
+    }
+    if (found) {
+      return target;
+    } else {
+      return -1;
     }
   }
 
@@ -91,12 +138,12 @@ class _CopyWordState extends State<CopyWord> {
     if (match) {
       _player.setAsset("sounds/success.mp3");
       _player.play();
-
       setState(() {
         _success = true;
       });
 
       await Future.delayed(const Duration(milliseconds: 2000));
+      _newWord = true;
       widget.onCompletion();
     } else {
       await Future.delayed(const Duration(milliseconds: 250));
@@ -122,23 +169,32 @@ class _CopyWordState extends State<CopyWord> {
       counterText: "",
     );
 
+    if (_newWord) {
+      resetRevealed();
+      _newWord = false;
+    }
+
     List<Widget> entryWidgets = [];
-    List<Widget> modelWidgets = [];
-    var letters = [];
+    LinkedHashMap<String, bool> letters = LinkedHashMap();
 
     for (var tc in _textControllers) {
       tc.dispose();
     }
     _textControllers.clear();
 
-    for (var letter in widget.word.characters) {
-      letters.add(letter);
+    for (var i = 0; i < widget.word.characters.length; ++i) {
+      var l = widget.word.characters.elementAt(i);
+      if (_revealedLetters.contains(i)) {
+        letters[l] = true;
+        entry[i] = l;
+      } else {
+        letters[l] = false;
+      }
     }
 
     for (var i = 0; i < widget.word.length; i++) {
       if (i != 0) {
         entryWidgets.add(const SizedBox(width: 20));
-        modelWidgets.add(const SizedBox(width: 20));
       }
 
       _textControllers.add(TextEditingController(text: entry[i]));
@@ -148,26 +204,28 @@ class _CopyWordState extends State<CopyWord> {
           child: TextFormField(
               key: UniqueKey(),
               maxLength: 2,
-              enabled: _entryEnabled,
-              autofocus: false,
+              enabled: _entryEnabled && !_revealedLetters.contains(i),
               focusNode: _focusNodes[i],
+              autofocus: false,
               controller: _textControllers[i],
               onTapOutside: (event) {},
               onChanged: (text) {
                 if (text.isEmpty) {
                   _textControllers[i].text = "\u200b";
-                  if (i == 0) {
+                  var target = findNextTarget(i, true);
+                  if (target == -1) {
                     setState(() {
                       resetEntry();
                     });
                   } else {
-                    _textControllers[i - 1].text = "\u200b";
-                    _focusNodes[i - 1].requestFocus();
+                    _textControllers[target].text = "\u200b";
+                    _focusNodes[target].requestFocus();
                   }
                 } else if (text.length == 2) {
                   entry[i] = text[1];
-                  if (i < widget.word.length - 1) {
-                    _focusNodes[i + 1].requestFocus();
+                  var target = findNextTarget(i, false);
+                  if (target >= 0) {
+                    _focusNodes[target].requestFocus();
                   } else {
                     validate();
                   }
@@ -178,23 +236,13 @@ class _CopyWordState extends State<CopyWord> {
               inputFormatters: [UpperCaseTextFormatter()],
               showCursor: false,
               decoration: textDecoration)));
-
-      modelWidgets.add(SizedBox(
-          width: 68,
-          child: TextFormField(
-              key: UniqueKey(),
-              initialValue: letters[i],
-              maxLength: 1,
-              enabled: false,
-              readOnly: true,
-              textAlign: TextAlign.center,
-              style: _entryTextStyle,
-              showCursor: false,
-              decoration: textDecoration)));
     }
 
     if (_iteration != 0) {
-      _focusNodes[0].requestFocus();
+      var target = findNextTarget(-1, false);
+      if (target >= 0) {
+        _focusNodes[target].requestFocus();
+      }
     }
     _iteration++;
 
@@ -204,8 +252,6 @@ class _CopyWordState extends State<CopyWord> {
       child: Column(
         mainAxisAlignment: MainAxisAlignment.center,
         children: [
-          Row(mainAxisSize: MainAxisSize.min, children: modelWidgets),
-          const SizedBox(height: 10),
           Row(mainAxisSize: MainAxisSize.min, children: entryWidgets),
           const SizedBox(height: 10),
           if (_success)

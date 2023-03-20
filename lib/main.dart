@@ -15,6 +15,7 @@ import 'package:tecletea/constants.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 import './copy_word.dart';
+import './complete_word.dart';
 import './pictogram_list.dart';
 
 void main() {
@@ -172,6 +173,8 @@ class _MainPageState extends State<MainPage> {
   LinkedHashMap<String, String> words = LinkedHashMap();
   var _state = 0;
   var _iteration = 1;
+  var _appMode = DEFAULT_APP_MODE;
+  var _percentRevealed = DEFAULT_PERCENT_REVEALED;
   var _maxIterations = DEFAULT_MAX_ITERATIONS;
   var _word = "";
   var _image = "";
@@ -190,6 +193,12 @@ class _MainPageState extends State<MainPage> {
     super.initState();
     futurePictogramList = fetchPictograms();
     player = AudioPlayer();
+    if (widget.prefs.getInt("appMode") != null) {
+      _appMode = widget.prefs.getInt("appMode")!;
+    }
+    if (widget.prefs.getInt("percentRevealed") != null) {
+      _percentRevealed = widget.prefs.getInt("percentRevealed")!;
+    }
     if (widget.prefs.getInt("maxIterations") != null) {
       _maxIterations = widget.prefs.getInt("maxIterations")!;
     }
@@ -309,6 +318,24 @@ class _MainPageState extends State<MainPage> {
                     _isInitialized = true;
                   }
 
+                  Widget wordWidget;
+                  if (_appMode == 0) {
+                    wordWidget = CopyWord(
+                        word: _word,
+                        onCompletion: () => {
+                              _iteration++,
+                              changeWord(),
+                            });
+                  } else {
+                    wordWidget = CompleteWord(
+                        word: _word,
+                        percentRevealed: _percentRevealed,
+                        onCompletion: () => {
+                              _iteration++,
+                              changeWord(),
+                            });
+                  }
+
                   return Column(children: [
                     Text("$_iteration/$_maxIterations", style: discreteText),
                     Expanded(
@@ -333,13 +360,7 @@ class _MainPageState extends State<MainPage> {
                               },
                             )),
                         const SizedBox(height: 10),
-                        SizedBox(
-                            child: CopyWord(
-                                word: _word,
-                                onCompletion: () => {
-                                      _iteration++,
-                                      changeWord(),
-                                    })),
+                        SizedBox(child: wordWidget),
                         const SizedBox(height: 100),
                       ],
                     ))
