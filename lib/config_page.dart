@@ -149,12 +149,12 @@ class _ConfigPageState extends State<ConfigPage> {
                               padding: const EdgeInsets.all(5),
                               child: Row(children: [
                                 SizedBox(
-                                    width: 250,
+                                    width: 175,
                                     child: RadioListTile(
                                         title: Text(
                                             AppLocalizations.of(context)!
                                                 .copyWord),
-                                        value: 0,
+                                        value: APP_MODE_COPY,
                                         groupValue: _appMode,
                                         onChanged: (value) {
                                           setState(() {
@@ -162,12 +162,25 @@ class _ConfigPageState extends State<ConfigPage> {
                                           });
                                         })),
                                 SizedBox(
-                                    width: 250,
+                                    width: 175,
                                     child: RadioListTile(
                                         title: Text(
                                             AppLocalizations.of(context)!
                                                 .completeWord),
-                                        value: 1,
+                                        value: APP_MODE_COMPLETE,
+                                        groupValue: _appMode,
+                                        onChanged: (value) {
+                                          setState(() {
+                                            if (value != null) _appMode = value;
+                                          });
+                                        })),
+                                SizedBox(
+                                    width: 225,
+                                    child: RadioListTile(
+                                        title: Text(
+                                            AppLocalizations.of(context)!
+                                                .copyCompleteWord),
+                                        value: APP_MODE_MIXED,
                                         groupValue: _appMode,
                                         onChanged: (value) {
                                           setState(() {

@@ -174,6 +174,8 @@ class _MainPageState extends State<MainPage> {
   var _state = 0;
   var _iteration = 1;
   var _appMode = DEFAULT_APP_MODE;
+  var _firstMode = true;
+  final _pictoHistory = <int>[];
   var _percentRevealed = DEFAULT_PERCENT_REVEALED;
   var _maxIterations = DEFAULT_MAX_ITERATIONS;
   var _word = "";
@@ -232,8 +234,21 @@ class _MainPageState extends State<MainPage> {
 
   void configureNextWord() {
     var nextPicto = next(0, pictoLocal.keys.length);
+    if (_appMode == APP_MODE_MIXED) {
+      if (_iteration > (_maxIterations + 1) / 2) {
+        _firstMode = false;
+      }
+
+      if (_firstMode) {
+        _pictoHistory.add(nextPicto);
+      } else {
+        nextPicto = _pictoHistory.removeAt(0);
+      }
+    }
+
     var newWord = pictoLocal[nextPicto]!.name;
     var imageId = pictoLocal[nextPicto]!.id;
+
     _image = "https://api.arasaac.org/api/pictograms/$imageId?download=false";
     _word = newWord
         .replaceAll('á', 'a')
@@ -319,7 +334,8 @@ class _MainPageState extends State<MainPage> {
                   }
 
                   Widget wordWidget;
-                  if (_appMode == 0) {
+                  if (_appMode == APP_MODE_COPY ||
+                      (_appMode == APP_MODE_MIXED && _firstMode)) {
                     wordWidget = CopyWord(
                         word: _word,
                         onCompletion: () => {
