@@ -20,6 +20,7 @@
   "minCharacters": "Número mínimo de caracteres por palabra: ",
   "maxCharacters": "Número máximo de caracteres por palabra: ",
   "showMore": "Mostrar más opciones de configuración",
+  "language": "Idioma",
   "includedCategories": "Categorías incluídas",
   "excludedCategories": "Categorías excluídas",
   "save": "GUARDAR",

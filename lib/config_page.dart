@@ -1,15 +1,18 @@
 import 'package:flutter/material.dart';
 import 'package:shared_preferences/shared_preferences.dart';
 import 'package:tecletea/constants.dart';
+import 'package:tecletea/main.dart';
 import 'package:flutter_gen/gen_l10n/app_localizations.dart';
 
 class ConfigPage extends StatefulWidget {
   final SharedPreferences prefs;
+  final String localeString;
   final VoidCallback onCompletion;
 
   const ConfigPage({
     Key? key,
     required this.prefs,
+    required this.localeString,
     required this.onCompletion,
   }) : super(key: key);
 
@@ -24,6 +27,7 @@ class _ConfigPageState extends State<ConfigPage> {
   var _includedCategories = DEFAULT_INCLUDED_CATEGORIES;
   var _excludedCategories = DEFAULT_EXCLUDED_CATEGORIES;
   var _appMode = DEFAULT_APP_MODE;
+  var _appLocale = DEFAULT_APP_LOCALE;
   var _percentRevealed = DEFAULT_PERCENT_REVEALED;
   var _showMoreConfig = false;
   final textControllerIncluded = TextEditingController();
@@ -56,6 +60,11 @@ class _ConfigPageState extends State<ConfigPage> {
     if (widget.prefs.getInt("percentRevealed") != null) {
       _percentRevealed = widget.prefs.getInt("percentRevealed")!;
     }
+    if (widget.prefs.getString("appLocale") != null) {
+      _appLocale = widget.prefs.getString("appLocale")!;
+    } else {
+      _appLocale = widget.localeString;
+    }
     textControllerIncluded.text = _includedCategories.join(", ");
     textControllerExcluded.text = _excludedCategories.join(", ");
   }
@@ -87,6 +96,42 @@ class _ConfigPageState extends State<ConfigPage> {
     );
     var moreConfig =
         Column(crossAxisAlignment: CrossAxisAlignment.start, children: [
+      Padding(
+          padding: const EdgeInsets.all(5),
+          child: Text(AppLocalizations.of(context)!.language,
+              textAlign: TextAlign.left, style: prefItemStyle)),
+      Container(
+          width: double.infinity,
+          decoration: BoxDecoration(
+            color: const Color.fromARGB(44, 150, 166, 115),
+            borderRadius: BorderRadius.circular(10.0),
+          ),
+          child: Padding(
+              padding: const EdgeInsets.all(5),
+              child: DropdownButton<String>(
+                value: SUPPORTED_LANGUAGES[_appLocale],
+                items: SUPPORTED_LANGUAGES.values
+                    .map<DropdownMenuItem<String>>((String value) {
+                  return DropdownMenuItem<String>(
+                    value: value,
+                    child: Text(value),
+                  );
+                }).toList(),
+                onChanged: (value) {
+                  setState(() {
+                    if (value != null) {
+                      for (var l in SUPPORTED_LANGUAGES.entries) {
+                        if (value == l.value) {
+                          _appLocale = l.key;
+                          MyApp.of(context)!.setLocale(
+                              Locale.fromSubtags(languageCode: _appLocale));
+                          break;
+                        }
+                      }
+                    }
+                  });
+                },
+              ))),
       Padding(
           padding: const EdgeInsets.all(5),
           child: Text(AppLocalizations.of(context)!.includedCategories,
@@ -328,6 +373,8 @@ class _ConfigPageState extends State<ConfigPage> {
                                       widget.prefs.setInt("appMode", _appMode);
                                       widget.prefs.setInt(
                                           "percentRevealed", _percentRevealed);
+                                      widget.prefs
+                                          .setString("appLocale", _appLocale);
                                       widget.prefs.setStringList(
                                           "includedCategories",
                                           textControllerIncluded.text

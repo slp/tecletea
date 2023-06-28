@@ -19,55 +19,110 @@ import './complete_word.dart';
 import './pictogram_list.dart';
 
 void main() {
-  runApp(const MyApp());
+  WidgetsFlutterBinding.ensureInitialized();
+  SharedPreferences.getInstance().then((instance) {
+    runApp(MyApp(prefs: instance));
+  });
 }
 
-class MyApp extends StatelessWidget {
-  const MyApp({super.key});
+class MyApp extends StatefulWidget {
+  final SharedPreferences prefs;
+
+  const MyApp({
+    Key? key,
+    required this.prefs,
+  }) : super(key: key);
+
+  @override
+  State<MyApp> createState() => MyAppState();
+
+  static MyAppState? of(BuildContext context) =>
+      context.findAncestorStateOfType<MyAppState>();
+}
+
+class MyAppState extends State<MyApp> {
+  Locale? _locale;
+
+  @override
+  void initState() {
+    if (widget.prefs.getString("appLocale") != null) {
+      _locale = Locale(widget.prefs.getString("appLocale")!);
+    }
+    super.initState();
+  }
+
+  void setLocale(Locale value) {
+    setState(() {
+      _locale = value;
+    });
+  }
 
   @override
   Widget build(BuildContext context) {
-    return ChangeNotifierProvider(
-      create: (context) => MyAppState(),
-      child: MaterialApp(
-        title: 'TecleTEA',
-        localizationsDelegates: const [
-          AppLocalizations.delegate,
-          GlobalMaterialLocalizations.delegate,
-          GlobalWidgetsLocalizations.delegate,
-          GlobalCupertinoLocalizations.delegate,
-        ],
-        supportedLocales: const [
-          Locale('en'), // English
-          Locale('es'), // Spanish
-        ],
-        theme: ThemeData(
-          useMaterial3: true,
-          colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
-        ),
-        home: const MyHomePage(),
-      ),
-    );
+    return ChangeNotifierProvider<_MyAppState>(
+        create: (context) => _MyAppState(),
+        child: MaterialApp(
+          title: 'TecleTEA',
+          locale: _locale,
+          localizationsDelegates: const [
+            AppLocalizations.delegate,
+            GlobalMaterialLocalizations.delegate,
+            GlobalWidgetsLocalizations.delegate,
+            GlobalCupertinoLocalizations.delegate,
+          ],
+          supportedLocales: const [
+            Locale('en'), // English
+            Locale('es'), // Spanish
+          ],
+          theme: ThemeData(
+            useMaterial3: true,
+            colorScheme: ColorScheme.fromSeed(seedColor: Colors.indigo),
+          ),
+          home: MyHomePage(prefs: widget.prefs),
+        ));
   }
 }
 
-class MyAppState extends ChangeNotifier {}
+class _MyAppState extends ChangeNotifier {}
 
 class MyHomePage extends StatefulWidget {
-  const MyHomePage({super.key});
+  final SharedPreferences prefs;
+
+  const MyHomePage({
+    Key? key,
+    required this.prefs,
+  }) : super(key: key);
 
   @override
   State<MyHomePage> createState() => _MyHomePageState();
 }
 
 class _MyHomePageState extends State<MyHomePage> {
-  late final Future<SharedPreferences> _preferences =
-      SharedPreferences.getInstance();
   var _selectedIndex = 0;
 
   @override
   Widget build(BuildContext context) {
     Locale currentLocale = Localizations.localeOf(context);
+    StatefulWidget page;
+    switch (_selectedIndex) {
+      case 0:
+        page = MainPage(prefs: widget.prefs, locale: currentLocale.toString());
+        break;
+      case 1:
+        page = ConfigPage(
+          prefs: widget.prefs,
+          localeString: currentLocale.toString(),
+          onCompletion: () {
+            setState(() {
+              _selectedIndex = 0;
+            });
+          },
+        );
+        break;
+      default:
+        throw UnimplementedError('no widget for $_selectedIndex');
+    }
+
     return Scaffold(
       bottomNavigationBar: SizedBox(
           height: 30,
@@ -113,41 +168,12 @@ class _MyHomePageState extends State<MyHomePage> {
               },
             ),
           ),
-          FutureBuilder<SharedPreferences>(
-              future: _preferences,
-              builder: (context, snapshot) {
-                if (snapshot.hasData) {
-                  Widget page;
-
-                  switch (_selectedIndex) {
-                    case 0:
-                      page = MainPage(
-                          prefs: snapshot.data!,
-                          locale: currentLocale.toString());
-                      break;
-                    case 1:
-                      page = ConfigPage(
-                        prefs: snapshot.data!,
-                        onCompletion: () {
-                          setState(() {
-                            _selectedIndex = 0;
-                          });
-                        },
-                      );
-                      break;
-                    default:
-                      throw UnimplementedError('no widget for $_selectedIndex');
-                  }
-                  return Expanded(
-                      child: Align(
-                          alignment: Alignment.center,
-                          child: Container(
-                              //constraints: BoxConstraints(maxWidth: 540.0),
-                              child: page)));
-                } else {
-                  return const CircularProgressIndicator();
-                }
-              }),
+          Expanded(
+              child: Align(
+                  alignment: Alignment.center,
+                  child: Container(
+                      //constraints: BoxConstraints(maxWidth: 540.0),
+                      child: page)))
         ],
       ),
     );

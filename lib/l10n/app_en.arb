@@ -20,6 +20,7 @@
   "minCharacters": "Minimum number of characters per word: ",
   "maxCharacters": "Maximum number of characters per word: ",
   "showMore": "Show more config options",
+  "language": "Language",
   "includedCategories": "Included categories",
   "excludedCategories": "Excluded categories",
   "save": "SAVE",
