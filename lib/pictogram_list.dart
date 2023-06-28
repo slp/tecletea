@@ -55,6 +55,9 @@ class PictogramList {
 
     for (var entry in json) {
       var tags = entry["tags"];
+      if (entry["keywords"].length == 0) {
+        continue;
+      }
       var keyword = entry["keywords"][0]["keyword"];
       var hasLocution = entry["keywords"][0]["hasLocution"];
 
