@@ -74,6 +74,7 @@ class MyAppState extends State<MyApp> {
             Locale('ca'), // Catala
             Locale('en'), // English
             Locale('es'), // Spanish
+            Locale('pt'), // Portuguese
           ],
           theme: ThemeData(
             useMaterial3: true,
@@ -214,6 +215,7 @@ class _MainPageState extends State<MainPage> {
   late Future<PictogramList> futurePictogramList;
   LinkedHashMap<int, Pictogram> pictoLocal = LinkedHashMap();
   late AudioPlayer player;
+  late bool hasLocutions = true;
   final discreteText = const TextStyle(
       color: Colors.grey, fontSize: 12, fontWeight: FontWeight.w500);
 
@@ -245,8 +247,13 @@ class _MainPageState extends State<MainPage> {
     final response = await http.get(Uri.parse(
         'https://api.arasaac.org/api/pictograms/all/${widget.locale}'));
 
+    if (widget.locale == "pt") {
+      hasLocutions = false;
+    }
+
     if (response.statusCode == 200) {
-      return PictogramList.fromJson(jsonDecode(response.body), widget.prefs);
+      return PictogramList.fromJson(
+          jsonDecode(response.body), widget.prefs, !hasLocutions);
     } else {
       throw Exception('Failed to load album');
     }
@@ -284,7 +291,9 @@ class _MainPageState extends State<MainPage> {
         .replaceAll('ó', 'o')
         .replaceAll('ú', 'u')
         .toUpperCase();
-    playSound(newWord);
+    if (hasLocutions) {
+      playSound(newWord);
+    }
     FocusScope.of(context).requestFocus(outFocus);
   }
 

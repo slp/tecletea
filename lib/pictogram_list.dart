@@ -32,7 +32,8 @@ class PictogramList {
     return included;
   }
 
-  factory PictogramList.fromJson(List<dynamic> json, SharedPreferences prefs) {
+  factory PictogramList.fromJson(
+      List<dynamic> json, SharedPreferences prefs, bool ignoreLocutions) {
     LinkedHashMap<int, Pictogram> list = LinkedHashMap();
     var i = 0;
     var minCharacters = DEFAULT_MIN_CHARACTERS;
@@ -61,7 +62,7 @@ class PictogramList {
       var keyword = entry["keywords"][0]["keyword"];
       var hasLocution = entry["keywords"][0]["hasLocution"];
 
-      if (hasLocution &&
+      if ((hasLocution || ignoreLocutions) &&
           keyword.length >= minCharacters &&
           keyword.length <= maxCharacters &&
           isInList(tags, includedCategories) &&

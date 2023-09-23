@@ -12,4 +12,9 @@ const DEFAULT_APP_MODE = APP_MODE_COPY;
 const DEFAULT_PERCENT_REVEALED = 0;
 const LIMIT_MAX_CHARACTERS = 8;
 const DEFAULT_APP_LOCALE = "en";
-const SUPPORTED_LANGUAGES = {"ca": "Catalá", "en": "English", "es": "Español"};
+const SUPPORTED_LANGUAGES = {
+  "ca": "Catalá",
+  "en": "English",
+  "es": "Español",
+  "pt": "Português"
+};
