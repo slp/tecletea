@@ -395,8 +395,8 @@ class _MainPageState extends State<MainPage> {
                       mainAxisAlignment: MainAxisAlignment.center,
                       children: [
                         SizedBox(
-                            width: 300,
-                            height: 300,
+                            width: 200,
+                            height: 200,
                             child: Image.network(
                               _image,
                               frameBuilder: (context, child, frame,

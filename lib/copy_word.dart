@@ -4,14 +4,17 @@ import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
 import 'package:just_audio/just_audio.dart';
 import 'package:tecletea/constants.dart';
+import 'package:tecletea/syllables.dart';
 
 class CopyWord extends StatefulWidget {
   final String word;
+  final String locale;
   final VoidCallback onCompletion;
 
   const CopyWord({
     Key? key,
     required this.word,
+    required this.locale,
     required this.onCompletion,
   }) : super(key: key);
 
@@ -134,64 +137,86 @@ class _CopyWordState extends State<CopyWord> {
       letters.add(letter);
     }
 
-    for (var i = 0; i < widget.word.length; i++) {
-      if (i != 0) {
-        entryWidgets.add(const SizedBox(width: 20));
-        modelWidgets.add(const SizedBox(width: 20));
+    List<String> syllables = [];
+    if (widget.locale == "es") {
+      syllables = Syllables.process(widget.word).getSyllables();
+    } else {
+      syllables.add(widget.word);
+    }
+
+    var first = true;
+    var pos = 0;
+
+    for (var syl in syllables) {
+      if (first) {
+        first = false;
+      } else {
+        entryWidgets.add(const SizedBox(width: 68));
+        modelWidgets.add(const SizedBox(width: 68));
       }
 
-      _textControllers.add(TextEditingController(text: entry[i]));
+      for (var i = 0; i < syl.length; i++) {
+        var lpos = pos;
+        if (i != 0) {
+          entryWidgets.add(const SizedBox(width: 20));
+          modelWidgets.add(const SizedBox(width: 20));
+        }
 
-      entryWidgets.add(SizedBox(
-          width: 68,
-          child: TextFormField(
-              key: UniqueKey(),
-              maxLength: 2,
-              enabled: _entryEnabled,
-              autofocus: false,
-              focusNode: _focusNodes[i],
-              controller: _textControllers[i],
-              onFieldSubmitted: (value) {},
-              onEditingComplete: () {},
-              onTapOutside: (event) {},
-              onChanged: (text) {
-                if (text.isEmpty) {
-                  _textControllers[i].text = "\u200b";
-                  if (i == 0) {
-                    setState(() {
-                      resetEntry();
-                    });
-                  } else {
-                    _textControllers[i - 1].text = "\u200b";
-                    _focusNodes[i - 1].requestFocus();
-                  }
-                } else if (text.length == 1 || text.length == 2) {
-                  entry[i] = text[text.length - 1];
-                  if (i < widget.word.length - 1) {
-                    _focusNodes[i + 1].requestFocus();
-                  } else {
-                    validate();
-                  }
-                }
-              },
-              textAlign: TextAlign.center,
-              style: _entryTextStyle,
-              inputFormatters: [UpperCaseTextFormatter()],
-              showCursor: false,
-              decoration: textDecoration)));
+        _textControllers.add(TextEditingController(text: entry[pos]));
 
-      modelWidgets.add(SizedBox(
-          width: 68,
-          child: TextFormField(
-              key: UniqueKey(),
-              initialValue: letters[i],
-              maxLength: 1,
-              enabled: false,
-              readOnly: true,
-              textAlign: TextAlign.center,
-              style: _entryTextStyle,
-              showCursor: false,
-              decoration: textDecoration)));
+        entryWidgets.add(SizedBox(
+            width: 68,
+            child: TextFormField(
+                key: UniqueKey(),
+                maxLength: 2,
+                enabled: _entryEnabled,
+                autofocus: false,
+                focusNode: _focusNodes[pos],
+                controller: _textControllers[pos],
+                onFieldSubmitted: (value) {},
+                onEditingComplete: () {},
+                onTapOutside: (event) {},
+                onChanged: (text) {
+                  if (text.isEmpty) {
+                    _textControllers[lpos].text = "\u200b";
+                    if (lpos == 0) {
+                      setState(() {
+                        resetEntry();
+                      });
+                    } else {
+                      _textControllers[lpos - 1].text = "\u200b";
+                      _focusNodes[lpos - 1].requestFocus();
+                    }
+                  } else if (text.length == 1 || text.length == 2) {
+                    entry[lpos] = text[text.length - 1];
+                    if (lpos < widget.word.length - 1) {
+                      _focusNodes[lpos + 1].requestFocus();
+                    } else {
+                      validate();
+                    }
+                  }
+                },
+                textAlign: TextAlign.center,
+                style: _entryTextStyle,
+                inputFormatters: [UpperCaseTextFormatter()],
+                showCursor: false,
+                decoration: textDecoration)));
+
+        modelWidgets.add(SizedBox(
+            width: 68,
+            child: TextFormField(
+                key: UniqueKey(),
+                initialValue: letters[lpos],
+                maxLength: 1,
+                enabled: false,
+                readOnly: true,
+                textAlign: TextAlign.center,
+                style: _entryTextStyle,
+                showCursor: false,
+                decoration: textDecoration)));
+
+        pos++;
+      }
     }
 
     if (_iteration != 0) {
@@ -208,7 +233,7 @@ class _CopyWordState extends State<CopyWord> {
           Row(mainAxisSize: MainAxisSize.min, children: modelWidgets),
           const SizedBox(height: 10),
           Row(mainAxisSize: MainAxisSize.min, children: entryWidgets),
-          const SizedBox(height: 10),
+          const SizedBox(height: 30),
           if (_success)
             Text(emojis[successEmoji], style: const TextStyle(fontSize: 48))
           else
