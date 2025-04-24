@@ -1,5 +1,4 @@
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -166,8 +165,8 @@ class _CopyWordState extends State<CopyWord> {
                     _textControllers[i - 1].text = "\u200b";
                     _focusNodes[i - 1].requestFocus();
                   }
-                } else if (text.length == 2) {
-                  entry[i] = text[1];
+                } else if (text.length == 1 || text.length == 2) {
+                  entry[i] = text[text.length - 1];
                   if (i < widget.word.length - 1) {
                     _focusNodes[i + 1].requestFocus();
                   } else {

@@ -1,6 +1,5 @@
 import 'dart:collection';
 import 'dart:math';
-import 'dart:ui';
 
 import 'package:flutter/material.dart';
 import 'package:flutter/services.dart';
@@ -223,8 +222,8 @@ class _CompleteWordState extends State<CompleteWord> {
                     _textControllers[target].text = "\u200b";
                     _focusNodes[target].requestFocus();
                   }
-                } else if (text.length == 2) {
-                  entry[i] = text[1];
+                } else if (text.length == 1 || text.length == 2) {
+                  entry[i] = text[text.length - 1];
                   var target = findNextTarget(i, false);
                   if (target >= 0) {
                     _focusNodes[target].requestFocus();
