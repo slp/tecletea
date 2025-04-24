@@ -12,6 +12,8 @@
   "copyWord": "Copy",
   "completeWord": "Complete",
   "copyCompleteWord": "Copy and complete",
+  "completeWordHints": "Complete with hints",
+  "copyCompleteWordHints": "Copy and complete with hints",
   "percentRevealed": "Revealed word percentage in \"Complete\" mode: ",
   "percent": "Percent",
   "words": "Words",

@@ -268,7 +268,7 @@ class _MainPageState extends State<MainPage> {
 
   void configureNextWord() {
     var nextPicto = next(0, pictoLocal.keys.length);
-    if (_appMode == APP_MODE_MIXED) {
+    if (_appMode == APP_MODE_MIXED || _appMode == APP_MODE_MIXED_HINTS) {
       if (_iteration > (_maxIterations + 1) / 2) {
         _firstMode = false;
       }
@@ -371,9 +371,12 @@ class _MainPageState extends State<MainPage> {
 
                   Widget wordWidget;
                   if (_appMode == APP_MODE_COPY ||
-                      (_appMode == APP_MODE_MIXED && _firstMode)) {
+                      ((_appMode == APP_MODE_MIXED ||
+                              _appMode == APP_MODE_MIXED_HINTS) &&
+                          _firstMode)) {
                     wordWidget = CopyWord(
                         word: _word,
+                        locale: widget.locale,
                         onCompletion: () => {
                               _iteration++,
                               changeWord(),
@@ -381,7 +384,11 @@ class _MainPageState extends State<MainPage> {
                   } else {
                     wordWidget = CompleteWord(
                         word: _word,
+                        locale: widget.locale,
+                        showHints: _appMode == APP_MODE_COMPLETE_HINTS ||
+                            _appMode == APP_MODE_MIXED_HINTS,
                         percentRevealed: _percentRevealed,
+                        random: widget._random,
                         onCompletion: () => {
                               _iteration++,
                               changeWord(),

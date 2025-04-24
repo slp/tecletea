@@ -38,6 +38,8 @@
  * Available at http://tip.dis.ulpgc.es                                         
  */
 
+import 'package:tecletea/utils.dart';
+
 class Syllables {
   final String _word;
   final List<int> _positions;
@@ -116,9 +118,9 @@ class Syllables {
         // Polysyllables
         String endLetter = _toLower(_wordLength - 1);
 
-        if ((!_isConsonant(_wordLength - 1) || (endLetter == 'y')) ||
+        if ((!isConsonant(_word[_wordLength - 1]) || (endLetter == 'y')) ||
             (((endLetter == 'n') ||
-                (endLetter == 's') && !_isConsonant(_wordLength - 2)))) {
+                (endLetter == 's') && !isConsonant(_word[_wordLength - 2])))) {
           _stressed = numSyl - 1; // Stressed penultimate syllable
         } else {
           _stressed = numSyl; // Stressed last syllable
@@ -136,7 +138,8 @@ class Syllables {
     // Dart doesn't have char, use String for single characters
     String lastConsonant = 'a';
 
-    while (pos < _wordLength && (_isConsonant(pos) && _toLower(pos) != 'y')) {
+    while (pos < _wordLength &&
+        (isConsonant(_word[pos]) && _toLower(pos) != 'y')) {
       lastConsonant = _toLower(pos);
       pos++;
     }
@@ -288,7 +291,7 @@ class Syllables {
         case 'ü':
           if (pos < _wordLength - 1) {
             // ¿Is there a third vowel?
-            if (!_isConsonant(pos + 1)) {
+            if (!isConsonant(_word[pos + 1])) {
               // Check previous character safely
               if (pos > 0 && _toLower(pos - 1) == 'h') pos--;
               return pos;
@@ -327,7 +330,7 @@ class Syllables {
   }
 
   int _coda(int pos) {
-    if (pos >= _wordLength || !_isConsonant(pos)) {
+    if (pos >= _wordLength || !isConsonant(_word[pos])) {
       return pos; // Syllable hasn't coda
     } else if (pos == _wordLength - 1) {
       // End of word
@@ -336,7 +339,7 @@ class Syllables {
     }
 
     // If there is only a consonant between vowels, it belongs to the following syllable
-    if (!_isConsonant(pos + 1)) return pos;
+    if (!isConsonant(_word[pos + 1])) return pos;
 
     String c1 = _toLower(pos);
     String c2 = _toLower(pos + 1);
@@ -346,7 +349,7 @@ class Syllables {
     if (pos < _wordLength - 2) {
       String c3 = _toLower(pos + 2);
 
-      if (!_isConsonant(pos + 2)) {
+      if (!isConsonant(_word[pos + 2])) {
         // There isn't third consonant
         // The groups ll, ch and rr begin a syllable
 
@@ -493,54 +496,5 @@ class Syllables {
       throw Exception('pos out of range');
     }
     return _word[pos].toLowerCase();
-  }
-
-  // Helper method to check if character at pos is a consonant
-  bool _isConsonant(int pos) {
-    if (pos < 0 || pos >= _wordLength) {
-      throw Exception('pos out of range');
-    }
-
-    // Get character at pos - case is handled by the switch
-    String c = _word[pos];
-    switch (c) {
-      // Open-vowel or close-vowel with written accent
-      // Added uppercase variants explicitly as Dart switch is case-sensitive
-      case 'a':
-      case 'á':
-      case 'A':
-      case 'Á':
-      case 'à':
-      case 'À':
-      case 'e':
-      case 'é':
-      case 'E':
-      case 'É':
-      case 'è':
-      case 'È':
-      case 'í':
-      case 'Í':
-      case 'ì':
-      case 'Ì':
-      case 'o':
-      case 'ó':
-      case 'O':
-      case 'Ó':
-      case 'ò':
-      case 'Ò':
-      case 'ú':
-      case 'Ú':
-      case 'ù':
-      case 'Ù':
-      // Close-vowel
-      case 'i':
-      case 'I':
-      case 'u':
-      case 'U':
-      case 'ü':
-      case 'Ü':
-        return false; // It's a vowel
-    }
-    return true; // It's a consonant
   }
 }

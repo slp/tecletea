@@ -192,46 +192,81 @@ class _ConfigPageState extends State<ConfigPage> {
                           ),
                           child: Padding(
                               padding: const EdgeInsets.all(5),
-                              child: Row(children: [
-                                SizedBox(
-                                    width: 175,
-                                    child: RadioListTile(
-                                        title: Text(
-                                            AppLocalizations.of(context)!
-                                                .copyWord),
-                                        value: APP_MODE_COPY,
-                                        groupValue: _appMode,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            if (value != null) _appMode = value;
-                                          });
-                                        })),
-                                SizedBox(
-                                    width: 175,
-                                    child: RadioListTile(
-                                        title: Text(
-                                            AppLocalizations.of(context)!
-                                                .completeWord),
-                                        value: APP_MODE_COMPLETE,
-                                        groupValue: _appMode,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            if (value != null) _appMode = value;
-                                          });
-                                        })),
-                                SizedBox(
-                                    width: 225,
-                                    child: RadioListTile(
-                                        title: Text(
-                                            AppLocalizations.of(context)!
-                                                .copyCompleteWord),
-                                        value: APP_MODE_MIXED,
-                                        groupValue: _appMode,
-                                        onChanged: (value) {
-                                          setState(() {
-                                            if (value != null) _appMode = value;
-                                          });
-                                        })),
+                              child: Column(children: [
+                                Row(children: [
+                                  SizedBox(
+                                      width: 175,
+                                      child: RadioListTile(
+                                          title: Text(
+                                              AppLocalizations.of(context)!
+                                                  .copyWord),
+                                          value: APP_MODE_COPY,
+                                          groupValue: _appMode,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (value != null)
+                                                _appMode = value;
+                                            });
+                                          })),
+                                  SizedBox(
+                                      width: 175,
+                                      child: RadioListTile(
+                                          title: Text(
+                                              AppLocalizations.of(context)!
+                                                  .completeWord),
+                                          value: APP_MODE_COMPLETE,
+                                          groupValue: _appMode,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (value != null)
+                                                _appMode = value;
+                                            });
+                                          })),
+                                  SizedBox(
+                                      width: 250,
+                                      child: RadioListTile(
+                                          title: Text(
+                                              AppLocalizations.of(context)!
+                                                  .copyCompleteWord),
+                                          value: APP_MODE_MIXED,
+                                          groupValue: _appMode,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (value != null)
+                                                _appMode = value;
+                                            });
+                                          })),
+                                ]),
+                                Row(children: [
+                                  SizedBox(
+                                      width: 250,
+                                      child: RadioListTile(
+                                          title: Text(
+                                              AppLocalizations.of(context)!
+                                                  .completeWordHints),
+                                          value: APP_MODE_COMPLETE_HINTS,
+                                          groupValue: _appMode,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (value != null)
+                                                _appMode = value;
+                                            });
+                                          })),
+                                  SizedBox(
+                                      width: 350,
+                                      child: RadioListTile(
+                                          title: Text(
+                                              AppLocalizations.of(context)!
+                                                  .copyCompleteWordHints),
+                                          value: APP_MODE_MIXED_HINTS,
+                                          groupValue: _appMode,
+                                          onChanged: (value) {
+                                            setState(() {
+                                              if (value != null)
+                                                _appMode = value;
+                                            });
+                                          })),
+                                ])
                               ]))),
                       const SizedBox(height: 10),
                       Padding(
